@@ -1,0 +1,21 @@
+/* Ilargi for Firefox's own pages */
+
+@-moz-document url("about:newtab"), url("about:home"), url("about:privatebrowsing") {
+  :root, body {
+    --newtab-background-color: #101213 !important;
+    --newtab-background-color-secondary: #161819 !important;
+    --newtab-text-primary-color: #edeff0 !important;
+    --newtab-text-secondary-color: #a9abac !important;
+    --newtab-element-hover-color: #1b1d1e !important;
+    --newtab-element-active-color: #1f2122 !important;
+    --newtab-primary-action-background: #6791c9 !important;
+    --newtab-primary-element-hover-color: #709ad2 !important;
+    --newtab-primary-element-text-color: #0c0e0f !important;
+    --newtab-border-color: #1f2122 !important;
+    --newtab-search-icon-color: #a9abac !important;
+    --color-accent-primary: #6791c9 !important;
+    --background-color-box: #161819 !important;
+    --background-color-canvas: #101213 !important;
+    background-color: #101213 !important;
+  }
+}

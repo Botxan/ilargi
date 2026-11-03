@@ -1,0 +1,46 @@
+#!/bin/bash
+# Fail-closed nftables kill switch for the shell's VPN tab (run via pkexec).
+#   vpn-killswitch on <wg-iface>   allow only loopback, the tunnel and its handshake
+#   vpn-killswitch off             remove the block
+# Manual recovery: sudo nft delete table inet qs_vpn_killswitch
+set -u
+TABLE="qs_vpn_killswitch"
+ACTION="${1:-}"
+
+case "$ACTION" in
+    on)
+        IFACE="${2:-}"
+        if [ -z "$IFACE" ]; then
+            echo "usage: $0 on <wg-iface>" >&2
+            exit 1
+        fi
+
+        nft delete table inet "$TABLE" 2>/dev/null
+        nft add table inet "$TABLE"
+        nft add chain inet "$TABLE" output '{ type filter hook output priority 0 ; policy accept ; }'
+        nft add rule inet "$TABLE" output oifname "lo" accept
+        nft add rule inet "$TABLE" output oifname "$IFACE" accept
+
+        while read -r _pubkey endpoint; do
+            [ "$endpoint" = "(none)" ] && continue
+            host="${endpoint%:*}"
+            port="${endpoint##*:}"
+            host="${host#\[}"
+            host="${host%\]}"
+            if [[ "$host" == *:* ]]; then
+                nft add rule inet "$TABLE" output ip6 daddr "$host" udp dport "$port" accept 2>/dev/null
+            else
+                nft add rule inet "$TABLE" output ip daddr "$host" udp dport "$port" accept 2>/dev/null
+            fi
+        done < <(wg show "$IFACE" endpoints 2>/dev/null)
+
+        nft add rule inet "$TABLE" output drop
+        ;;
+    off)
+        nft delete table inet "$TABLE" 2>/dev/null
+        ;;
+    *)
+        echo "usage: $0 on <wg-iface> | off" >&2
+        exit 1
+        ;;
+esac

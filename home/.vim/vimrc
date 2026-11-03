@@ -1,0 +1,7 @@
+unlet! skip_defaults_vim
+source $VIMRUNTIME/defaults.vim
+
+if has('termguicolors')
+  set termguicolors
+endif
+colorscheme ilargi

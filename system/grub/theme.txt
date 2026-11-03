@@ -1,0 +1,61 @@
+# Ilargi GRUB theme. Fonts: Roboto, built with grub-mkfont.
+title-text: ""
+desktop-color: "#101213"
+terminal-font: "Roboto Regular 16"
+
++ label {
+    top = 22%
+    left = 0
+    width = 100%
+    align = "center"
+    text = "Boot"
+    font = "Roboto Bold Regular 32"
+    color = "#edeff0"
+}
++ label {
+    top = 22%+48
+    left = 0
+    width = 100%
+    align = "center"
+    text = "choose a system"
+    font = "Roboto Regular 16"
+    color = "#a9abac"
+}
+
++ boot_menu {
+    left = 35%
+    width = 30%
+    top = 38%
+    height = 34%
+    item_font = "Roboto Regular 20"
+    item_color = "#a9abac"
+    selected_item_font = "Roboto Bold Regular 20"
+    selected_item_color = "#6791c9"
+    item_height = 40
+    item_padding = 12
+    item_spacing = 6
+    icon_width = 0
+    icon_height = 0
+    item_icon_space = 0
+    scrollbar = false
+}
+
++ label {
+    id = "__timeout__"
+    top = 80%
+    left = 0
+    width = 100%
+    align = "center"
+    text = "Booting in %d s"
+    font = "Roboto Regular 16"
+    color = "#6c6e6f"
+}
++ label {
+    top = 100%-48
+    left = 0
+    width = 100%
+    align = "center"
+    text = "↑ ↓ choose   ·   Enter boot   ·   e edit   ·   c console"
+    font = "Roboto Regular 16"
+    color = "#505253"
+}

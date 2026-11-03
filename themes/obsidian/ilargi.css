@@ -1,0 +1,130 @@
+/* Ilargi for Obsidian (Minimal theme) */
+
+body.theme-dark,
+.theme-dark {
+  --bg1: #101213 !important;
+  --bg2: #0c0e0f !important;
+  --bg3: #1b1d1e !important;
+  --ui1: #1f2122 !important;
+  --ui2: #27292a !important;
+  --ui3: #343637 !important;
+  --tx1: #edeff0 !important;
+  --tx2: #a9abac !important;
+  --tx3: #6c6e6f !important;
+  --tx4: #484a4b !important;
+  --ax1: #6791c9 !important;
+  --ax2: #709ad2 !important;
+  --ax3: #6791c9 !important;
+  --sp1: #0c0e0f !important;
+  --hl1: rgba(103,145,201, 0.28) !important;
+  --hl2: rgba(236,210,139, 0.22) !important;
+
+  --background-primary: #101213 !important;
+  --background-primary-alt: #161819 !important;
+  --background-secondary: #0c0e0f !important;
+  --background-secondary-alt: #0c0e0f !important;
+  --background-modifier-hover: rgba(237,239,240, 0.045) !important;
+  --background-modifier-active-hover: rgba(103,145,201, 0.15) !important;
+  --background-modifier-border: #1f2122 !important;
+  --background-modifier-form-field: #161819 !important;
+  --titlebar-background: #0c0e0f !important;
+  --titlebar-background-focused: #0c0e0f !important;
+  --ribbon-background: #0c0e0f !important;
+  --tab-container-background: #0c0e0f !important;
+  --interactive-accent: #6791c9 !important;
+  --interactive-accent-hover: #709ad2 !important;
+  --text-on-accent: #0c0e0f !important;
+  --text-accent: #709ad2 !important;
+  --text-accent-hover: #6791c9 !important;
+  --text-selection: rgba(103,145,201, 0.28) !important;
+  --text-highlight-bg: rgba(236,210,139, 0.22) !important;
+  --link-color: #709ad2 !important;
+  --link-external-color: #67afc1 !important;
+  --link-unresolved-color: #a9abac !important;
+  --scrollbar-thumb-bg: #27292a !important;
+  --scrollbar-active-thumb-bg: #343637 !important;
+
+  --color-red: #df5b61 !important;           --color-red-rgb: 223,91,97 !important;
+  --color-orange: #de8f78 !important;     --color-orange-rgb: 222,143,120 !important;
+  --color-yellow: #ecd28b !important;        --color-yellow-rgb: 236,210,139 !important;
+  --color-green: #78b892 !important;       --color-green-rgb: 120,184,146 !important;
+  --color-cyan: #67afc1 !important;         --color-cyan-rgb: 103,175,193 !important;
+  --color-blue: #6791c9 !important;         --color-blue-rgb: 103,145,201 !important;
+  --color-purple: #bc83e3 !important;    --color-purple-rgb: 188,131,227 !important;
+  --color-pink: #e8646a !important;         --color-pink-rgb: 232,100,106 !important;
+
+  --graph-node: #a9abac !important;
+  --graph-node-focused: #6791c9 !important;
+  --graph-node-tag: #78b892 !important;
+  --graph-node-attachment: #de8f78 !important;
+  --graph-node-unresolved: #484a4b !important;
+  --graph-line: #27292a !important;
+}
+
+body {
+  --mint: #78b892;
+  --cyan: #67afc1;
+  --cool-cyan: #67afc1;
+  --light-blue: #709ad2;
+  --blue: #5a84bc;
+  --blue-violet: #bc83e3;
+  --violet: #bc83e3;
+  --purple: #e8646a;
+  --magenta: #de8f78;
+  --hot-red: #df5b61;
+  --red: #df5b61;
+  --red-orange: #e8646a;
+  --orange: #de8f78;
+  --amber: #de8f78;
+  --yellow: #ecd28b;
+  --lime: #78b892;
+  --cool-gray: #484a4b;
+  --default-text-color: #edeff0;
+  --shadow: #0c0e0f;
+}
+
+.theme-dark .tag:not(.token),
+.theme-dark a.tag {
+  background-color: rgba(103,145,201, 0.16) !important;
+  color: #709ad2 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 1px 7px !important;
+}
+
+.theme-dark .markdown-rendered pre,
+.theme-dark .HyperMD-codeblock,
+.theme-dark .cm-s-obsidian div.HyperMD-codeblock-bg {
+  background-color: #161819 !important;
+}
+.theme-dark .markdown-rendered pre { border-radius: 10px !important; border: none !important; }
+.theme-dark .markdown-rendered :not(pre) > code,
+.theme-dark .cm-s-obsidian span.cm-inline-code {
+  background-color: #1b1d1e !important;
+  color: #709ad2 !important;
+  border-radius: 5px !important;
+}
+
+.theme-dark .markdown-rendered blockquote,
+.theme-dark .HyperMD-quote::before {
+  border-color: #6791c9 !important;
+}
+
+.theme-dark .nav-file-title.is-active,
+.theme-dark .tree-item-self.is-active {
+  background-color: rgba(103,145,201, 0.14) !important;
+  box-shadow: inset 2px 0 0 #6791c9 !important;
+}
+
+.theme-dark input[type=checkbox]:checked {
+  background-color: #6791c9 !important;
+  border-color: #6791c9 !important;
+}
+
+.theme-dark .workspace-tab-header.is-active {
+  background-color: #101213 !important;
+  box-shadow: none !important;
+}
+.theme-dark .workspace-tab-header.is-active .workspace-tab-header-inner-title {
+  color: #edeff0 !important;
+}

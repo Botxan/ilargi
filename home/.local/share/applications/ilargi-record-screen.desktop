@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Record screen
+GenericName=Screen recorder
+Comment=Start or stop recording the monitor you are looking at
+Icon=camera-video
+Exec=sh -c "\\$HOME/.config/quickshell/scripts/record-screen.sh"
+Terminal=false
+Categories=AudioVideo;Recorder;
+Keywords=record;recording;screen;capture;video;

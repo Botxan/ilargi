@@ -1,0 +1,85 @@
+/* Ilargi for the Firefox UI */
+
+:root {
+
+  --toolbox-background-image: none !important;
+  --toolbox-background-gradient: none !important;
+  --toolbox-background-color: #0c0e0f !important;
+  --toolbox-background-color-inactive: #0c0e0f !important;
+  --toolbox-text-color: #edeff0 !important;
+  --toolbox-text-color-inactive: #a9abac !important;
+  --lwt-accent-color: #0c0e0f !important;
+  --lwt-text-color: #edeff0 !important;
+
+  --toolbar-background-color: #101213 !important;
+  --toolbar-bgcolor: #101213 !important;
+  --toolbar-text-color: #edeff0 !important;
+  --toolbar-color: #edeff0 !important;
+  --toolbarbutton-icon-fill: #edeff0 !important;
+  --tabs-navbar-separator-color: transparent !important;
+  --chrome-content-separator-color: #101213 !important;
+
+  --tab-background-color-selected: #101213 !important;
+  --tab-text-color-selected: #edeff0 !important;
+  --tab-background-color-hover: #161819 !important;
+  --tab-text-color: #a9abac !important;
+  --tab-text-color-hover: #edeff0 !important;
+
+  --toolbar-field-background-color: #1b1d1e !important;
+  --toolbar-field-background-color-focus: #161819 !important;
+  --toolbar-field-text-color: #edeff0 !important;
+  --toolbar-field-text-color-focus: #edeff0 !important;
+  --toolbar-field-border-color: transparent !important;
+  --toolbar-field-border-color-focus: #6791c9 !important;
+  --lwt-toolbar-field-highlight: #6791c9 !important;
+  --lwt-toolbar-field-highlight-text: #0c0e0f !important;
+
+  --panel-background-color: #161819 !important;
+  --panel-text-color: #edeff0 !important;
+  --panel-border-color: #1f2122 !important;
+  --popup-background-color: #161819 !important;
+  --arrowpanel-background: #161819 !important;
+  --arrowpanel-color: #edeff0 !important;
+  --arrowpanel-border-color: #1f2122 !important;
+  --menu-background-color: #161819 !important;
+  --menu-color: #edeff0 !important;
+  --menuitem-hover-background-color: #1f2122 !important;
+  --sidebar-background-color: #101213 !important;
+  --sidebar-text-color: #edeff0 !important;
+
+  --color-accent-primary: #6791c9 !important;
+  --color-accent-primary-hover: #709ad2 !important;
+  --color-accent-primary-active: #709ad2 !important;
+  --focus-outline-color: #6791c9 !important;
+  --button-text-color-primary: #0c0e0f !important;
+  --toolbarbutton-icon-fill-attention: #6791c9 !important;
+  --link-color: #709ad2 !important;
+}
+
+#tabbrowser-tabs, .tabbrowser-tab, .tab-background {
+  --tab-background-color: transparent !important;
+  --tab-background-color-hover: #161819 !important;
+  --tab-background-color-selected: #1b1d1e !important;
+  --background-color-box: #1b1d1e !important;
+  --tab-text-color: #a9abac !important;
+  --tab-text-color-hover: #edeff0 !important;
+  --tab-text-color-selected: #edeff0 !important;
+  --tab-border-color-selected-leading: #6791c9 !important;
+  --tab-border-color-selected-trailing: #6791c9 !important;
+
+  --tab-border-color-accent: linear-gradient(#6791c9, #6791c9) !important;
+  --tab-icon-fill-loading: #6791c9 !important;
+}
+:root {
+  --tab-border-color-selected-leading: #6791c9 !important;
+  --tab-border-color-selected-trailing: #6791c9 !important;
+  --tab-border-color-accent: linear-gradient(#6791c9, #6791c9) !important;
+}
+
+.urlbarView-row[selected] > .urlbarView-row-inner,
+.urlbarView-row:hover > .urlbarView-row-inner {
+  background-color: #1f2122 !important;
+}
+.urlbarView-row[selected] > .urlbarView-row-inner {
+  box-shadow: inset 2px 0 0 #6791c9 !important;
+}

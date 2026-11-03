@@ -1,0 +1,4 @@
+# never commit machine data
+*.ilargi-bak
+__pycache__/
+.zsh_history

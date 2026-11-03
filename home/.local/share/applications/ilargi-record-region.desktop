@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Record region
+GenericName=Screen recorder
+Comment=Drag a region and record it
+Icon=camera-video
+Exec=sh -c "\\$HOME/.config/quickshell/scripts/record-region.sh"
+Terminal=false
+Categories=AudioVideo;Recorder;
+Keywords=record;recording;region;area;crop;capture;

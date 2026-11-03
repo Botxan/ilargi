@@ -1,0 +1,365 @@
+#!/usr/bin/env python3
+"""soundboard — play sounds through the virtual "Soundboard Mic", so they are
+heard in calls and in your headphones at the same time.
+
+    soundboard play <id>      play the entry with that id (again: stop it)
+    soundboard stop           stop whatever is playing
+    soundboard current        id of what is playing (empty if nothing)
+    soundboard list           list the mapped entries
+    soundboard status         check the virtual mic
+    soundboard sync           regenerate the Hyprland binds from the JSON
+
+    soundboard web [page] [query]   list sounds on myinstants (JSON)
+    soundboard fetch <url>          download one into the sounds folder
+    soundboard hear <url>           preview it without downloading (headphones only)
+
+Entries live in ~/.local/state/ilargi/soundboard.json, edited from the shell.
+"""
+import html, json, os, re, signal, subprocess, sys, tempfile, time
+import urllib.error, urllib.parse, urllib.request
+
+HOME       = os.path.expanduser("~")
+MIC_SINK   = "soundboard_mic_in"
+STATE_DIR  = os.path.join(os.environ.get("XDG_STATE_HOME") or f"{HOME}/.local/state", "ilargi")
+CONF       = f"{STATE_DIR}/soundboard.json"
+SOUND_DIR  = f"{HOME}/.local/share/soundboard"
+RUN_DIR    = os.environ.get("XDG_RUNTIME_DIR", "/tmp") + "/soundboard"
+BINDS_LUA  = f"{STATE_DIR}/soundboard.lua"
+SELF       = f"{HOME}/.local/bin/soundboard"
+MONITOR_VOL = int(os.environ.get("SOUNDBOARD_MONITOR_VOL", "70"))
+
+
+def die(msg):
+    print(f"soundboard: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def load():
+    try:
+        with open(CONF) as fh:
+            cfg = json.load(fh)
+    except FileNotFoundError:
+        die(f"config not found: {CONF}")
+    except json.JSONDecodeError as e:
+        die(f"{CONF} is not valid JSON: {e}")
+    cfg.setdefault("masterVolume", 100)
+    cfg.setdefault("items", [])
+    return cfg
+
+
+def resolve(entry):
+    f = (entry.get("file") or "").strip()
+    if not f:
+        return None
+    return f if f.startswith("/") else os.path.join(SOUND_DIR, f)
+
+
+STATE = os.path.join(RUN_DIR, "current")
+
+
+def notify(event, ident):
+    try:
+        subprocess.run(["qs", "ipc", "call", "soundboard", event, ident],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3)
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+
+
+def read_state():
+    try:
+        with open(STATE) as fh:
+            ident, _, token = fh.read().strip().partition("\t")
+        return ident, token
+    except OSError:
+        return None, None
+
+
+def current():
+    ident, _ = read_state()
+    if not ident:
+        return None
+    try:
+        with open(os.path.join(RUN_DIR, "mic.pid")) as fh:
+            pid = int(fh.read().strip())
+        with open(f"/proc/{pid}/cmdline", "rb") as fh:
+            if b"mpv" not in fh.read():
+                return None
+        with open(f"/proc/{pid}/stat") as fh:
+            if fh.read().rsplit(")", 1)[1].split()[0] == "Z":
+                return None
+    except (OSError, ValueError, IndexError):
+        return None
+    return ident
+
+
+def stop_all():
+    was = current()
+    try:
+        os.unlink(STATE)
+    except OSError:
+        pass
+    if not os.path.isdir(RUN_DIR):
+        return was
+    for name in os.listdir(RUN_DIR):
+        if not name.endswith(".pid"):
+            continue
+        path = os.path.join(RUN_DIR, name)
+        try:
+            with open(path) as fh:
+                os.kill(int(fh.read().strip()), signal.SIGTERM)
+        except (OSError, ValueError):
+            pass
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+    return was
+
+
+def spawn(path, volume, device, tag):
+    cmd = ["mpv", "--no-terminal", "--no-video", "--no-config",
+           "--keep-open=no", f"--volume={volume}"]
+    if device:
+        cmd.append(f"--audio-device=pulse/{device}")
+    cmd.append(path)
+    proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    os.makedirs(RUN_DIR, exist_ok=True)
+    with open(os.path.join(RUN_DIR, f"{tag}.pid"), "w") as fh:
+        fh.write(str(proc.pid))
+    return proc
+
+
+def keep(ident, path, vol):
+    if os.fork() != 0:
+        return
+    os.setsid()
+    devnull = os.open(os.devnull, os.O_RDWR)
+    for fd in (0, 1, 2):
+        os.dup2(devnull, fd)
+
+    token = f"{os.getpid()}-{time.monotonic_ns()}"
+    mic = spawn(path, vol, MIC_SINK, "mic")
+    mon = spawn(path, round(vol * MONITOR_VOL / 100), None, "monitor")
+    with open(STATE, "w") as fh:
+        fh.write(f"{ident}\t{token}")
+    notify("started", ident)
+
+    mic.wait()
+    mon.wait()
+
+    _, now = read_state()
+    if now == token:
+        for name in ("current", "mic.pid", "monitor.pid"):
+            try:
+                os.unlink(os.path.join(RUN_DIR, name))
+            except OSError:
+                pass
+        notify("stopped", ident)
+    os._exit(0)
+
+
+def play(ident):
+    cfg = load()
+    entry = next((i for i in cfg["items"] if i.get("id") == ident), None)
+    if entry is None:
+        die(f"no entry with id «{ident}»")
+    path = resolve(entry)
+    if path is None:
+        sys.exit(0)
+    if not os.access(path, os.R_OK):
+        die(f"cannot read «{path}»")
+
+    vol = max(0, min(200, round(cfg["masterVolume"] * entry.get("volume", 100) / 100)))
+
+    if current() == ident:
+        stop_all()
+        notify("stopped", ident)
+        return
+    stop_all()
+    keep(ident, path, vol)
+
+
+def list_items():
+    cfg = load()
+    print(f"master volume: {cfg['masterVolume']}%\n")
+    for entry in cfg["items"]:
+        path = resolve(entry)
+        if path is None:
+            state = "—"
+        elif os.access(path, os.R_OK):
+            state = os.path.basename(path)
+        else:
+            state = f"{os.path.basename(path)}  [MISSING FILE]"
+        print(f"  {entry['label']:<12} {entry['key']:<22} {state}")
+
+
+def status():
+    ok = True
+    sinks = subprocess.run(["pactl", "list", "short", "sinks"],
+                           capture_output=True, text=True).stdout
+    if any(MIC_SINK == line.split("\t")[1] for line in sinks.splitlines() if "\t" in line):
+        print(f"virtual mic: OK (sink {MIC_SINK})")
+    else:
+        print("virtual mic: MISSING — check "
+              "~/.config/pipewire/pipewire.conf.d/99-soundboard.conf, then run:")
+        print("             systemctl --user restart pipewire pipewire-pulse wireplumber")
+        ok = False
+
+    links = subprocess.run(["pw-link", "-l"], capture_output=True, text=True).stdout
+    if "soundboard_mic_bridge_in:input" in links:
+        print("real mic:    bridged into the virtual mic")
+    else:
+        print("real mic:    NOT connected — nobody would hear you")
+        ok = False
+    return 0 if ok else 1
+
+
+def sync():
+    cfg = load()
+    lines = [
+        "-- Generated by `soundboard sync` from soundboard.json; edits are overwritten.",
+        "",
+        'local sb = os.getenv("HOME") .. "/.local/bin/soundboard"',
+        "",
+    ]
+    for entry in cfg["items"]:
+        key = (entry.get("key") or "").strip()
+        if not key:
+            continue
+        ident = entry["id"].replace('"', '')
+        lines.append(f'hl.bind("{key}", hl.dsp.exec_cmd(sb .. " play {ident}"))')
+    os.makedirs(os.path.dirname(BINDS_LUA), exist_ok=True)
+    with open(BINDS_LUA, "w") as fh:
+        fh.write("\n".join(lines) + "\n")
+    r = subprocess.run(["hyprctl", "reload"], capture_output=True, text=True)
+    print(f"{len([l for l in lines if l.startswith('hl.bind')])} binds -> {BINDS_LUA}")
+    if r.stdout.strip():
+        print(f"hyprctl reload: {r.stdout.strip()}")
+
+
+MI_BASE    = "https://www.myinstants.com"
+MI_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0",
+    "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+}
+MI_ITEM = re.compile(
+    r"""play\('(/media/sounds/[^']+)'.*?class="instant-link[^"]*">(.*?)</a>""",
+    re.S)
+MI_PAGE_SIZE = 36
+
+
+def mi_get(url, timeout=15):
+    req = urllib.request.Request(url, headers=MI_HEADERS)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read()
+
+
+def mi_sound_url(url):
+    if url.startswith("/media/sounds/"):
+        url = MI_BASE + url
+    p = urllib.parse.urlparse(url)
+    if p.scheme != "https" or p.netloc != "www.myinstants.com" \
+            or not p.path.startswith("/media/sounds/"):
+        die(f"not a myinstants sound: {url}")
+    return url
+
+
+def mi_filename(url):
+    name = os.path.basename(urllib.parse.unquote(urllib.parse.urlparse(url).path))
+    name = re.sub(r"[^\w.\-]+", "_", name).strip("._") or "sound.mp3"
+    return name
+
+
+def web(args):
+    page = 1
+    if args and args[0].isdigit():
+        page = max(1, int(args[0]))
+        args = args[1:]
+    query = " ".join(args).strip()
+    if query:
+        url = f"{MI_BASE}/en/search/?" + urllib.parse.urlencode({"name": query, "page": page})
+    else:
+        url = f"{MI_BASE}/en/index/us/?page={page}"
+
+    out = {"page": page, "query": query, "items": [], "more": False, "error": ""}
+    try:
+        text = mi_get(url).decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            out["error"] = f"myinstants respondio {e.code}"
+        print(json.dumps(out)); return
+    except (urllib.error.URLError, OSError) as e:
+        out["error"] = f"cannot reach myinstants ({getattr(e, 'reason', e)})"
+        print(json.dumps(out)); return
+
+    seen = set()
+    for path, name in MI_ITEM.findall(text):
+        if path in seen:
+            continue
+        seen.add(path)
+        url = MI_BASE + path
+        out["items"].append({
+            "name": html.unescape(re.sub(r"<[^>]+>", "", name)).strip(),
+            "url": url,
+            "file": mi_filename(url),
+        })
+    out["more"] = len(out["items"]) >= MI_PAGE_SIZE
+    print(json.dumps(out))
+
+
+def fetch(url):
+    url = mi_sound_url(url)
+    name = mi_filename(url)
+    dest = os.path.join(SOUND_DIR, name)
+    if os.path.exists(dest):
+        print(name); return
+    try:
+        data = mi_get(url, timeout=30)
+    except (urllib.error.URLError, OSError) as e:
+        die(f"download failed {url}: {getattr(e, 'reason', e)}")
+    os.makedirs(SOUND_DIR, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=SOUND_DIR, prefix=".download-")
+    with os.fdopen(fd, "wb") as fh:
+        fh.write(data)
+    os.chmod(tmp, 0o644)
+    os.replace(tmp, dest)
+    print(name)
+
+
+def hear(url):
+    url = mi_sound_url(url)
+    try:
+        data = mi_get(url, timeout=30)
+    except (urllib.error.URLError, OSError) as e:
+        die(f"fetch failed {url}: {getattr(e, 'reason', e)}")
+    os.makedirs(RUN_DIR, exist_ok=True)
+    tmp = os.path.join(RUN_DIR, "escucha" + os.path.splitext(mi_filename(url))[1])
+    with open(tmp, "wb") as fh:
+        fh.write(data)
+    was = stop_all()
+    if was:
+        notify("stopped", was)
+    spawn(tmp, MONITOR_VOL, None, "monitor")
+
+
+def main():
+    args = sys.argv[1:]
+    cmd = args[0] if args else ""
+    if cmd == "play" and len(args) > 1: play(args[1])
+    elif cmd == "web":    web(args[1:])
+    elif cmd == "fetch" and len(args) > 1: fetch(args[1])
+    elif cmd == "hear" and len(args) > 1:  hear(args[1])
+    elif cmd == "stop":
+        was = stop_all()
+        if was:
+            notify("stopped", was)
+    elif cmd == "current": print(current() or "")
+    elif cmd == "list":   list_items()
+    elif cmd == "status": sys.exit(status())
+    elif cmd == "sync":   sync()
+    else: print(__doc__.strip())
+
+
+if __name__ == "__main__":
+    main()

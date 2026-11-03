@@ -1,0 +1,125 @@
+/**
+ * @name Ilargi
+ * @author Ilargi
+ * @description Ilargi palette for Discord (Vencord / Vesktop).
+ * @version 1.0.0
+ */
+:root,
+.theme-dark,
+.theme-darker,
+.theme-midnight,
+.visual-refresh,
+.visual-refresh.theme-dark {
+
+  --background-base-lowest: #0c0e0f !important;
+  --background-base-lower: #101213 !important;
+  --background-base-low: #161819 !important;
+  --background-surface-high: #161819 !important;
+  --background-surface-higher: #1b1d1e !important;
+  --background-surface-highest: #1f2122 !important;
+  --chat-background-default: #161819 !important;
+  --app-frame-background: #0c0e0f !important;
+  --app-frame-border: transparent !important;
+
+  --background-primary: #161819 !important;
+  --background-secondary: #101213 !important;
+  --background-secondary-alt: #101213 !important;
+  --background-tertiary: #0c0e0f !important;
+  --background-floating: #161819 !important;
+  --background-nested-floating: #1b1d1e !important;
+  --background-accent: #27292a !important;
+  --background-mobile-primary: #161819 !important;
+  --background-mobile-secondary: #101213 !important;
+  --modal-background: #161819 !important;
+  --modal-footer-background: #101213 !important;
+  --home-background: #161819 !important;
+  --bg-overlay-chat: #161819 !important;
+  --bg-overlay-app-frame: #0c0e0f !important;
+  --bg-base-primary: #161819 !important;
+  --bg-base-secondary: #101213 !important;
+  --bg-base-tertiary: #0c0e0f !important;
+  --bg-surface-raised: #1b1d1e !important;
+  --bg-surface-overlay: #161819 !important;
+
+  --channeltextarea-background: #1b1d1e !important;
+  --input-background: #1b1d1e !important;
+  --input-background-default: #1b1d1e !important;
+  --input-border-default: transparent !important;
+  --deprecated-text-input-bg: #1b1d1e !important;
+  --deprecated-text-input-border: transparent !important;
+
+  --background-modifier-hover: rgba(237,239,240, 0.045) !important;
+  --background-modifier-active: rgba(237,239,240, 0.07) !important;
+  --background-modifier-selected: rgba(237,239,240, 0.08) !important;
+  --background-modifier-accent: rgba(237,239,240, 0.06) !important;
+  --background-mod-subtle: rgba(237,239,240, 0.045) !important;
+  --background-mod-normal: rgba(237,239,240, 0.07) !important;
+  --background-mod-strong: rgba(237,239,240, 0.1) !important;
+  --border-subtle: rgba(237,239,240, 0.05) !important;
+  --border-faint: rgba(237,239,240, 0.04) !important;
+  --border-normal: rgba(237,239,240, 0.07) !important;
+  --border-strong: rgba(237,239,240, 0.1) !important;
+
+  --text-normal: #edeff0 !important;
+  --text-default: #edeff0 !important;
+  --text-strong: #edeff0 !important;
+  --text-muted: #a9abac !important;
+  --text-subtle: #a9abac !important;
+  --header-primary: #edeff0 !important;
+  --header-secondary: #a9abac !important;
+  --channels-default: #a9abac !important;
+  --channel-icon: #a9abac !important;
+  --interactive-normal: #a9abac !important;
+  --interactive-hover: #edeff0 !important;
+  --interactive-active: #edeff0 !important;
+  --interactive-muted: #484a4b !important;
+  --interactive-text-default: #a9abac !important;
+  --interactive-text-hover: #edeff0 !important;
+  --interactive-text-active: #edeff0 !important;
+  --icon-default: #a9abac !important;
+  --icon-strong: #edeff0 !important;
+  --text-link: #709ad2 !important;
+
+  --brand-500: #6791c9 !important;
+  --brand-560: #6791c9 !important;
+  --brand-600: #6791c9 !important;
+  --brand-360: #709ad2 !important;
+  --brand-400: #709ad2 !important;
+  --brand-experiment: #6791c9 !important;
+  --brand-experiment-560: #6791c9 !important;
+  --brand-experiment-600: #6791c9 !important;
+  --control-brand-foreground: #709ad2 !important;
+  --control-brand-foreground-new: #709ad2 !important;
+  --button-filled-brand-background: #6791c9 !important;
+  --button-filled-brand-background-hover: #709ad2 !important;
+  --button-filled-brand-background-active: #709ad2 !important;
+  --button-filled-brand-text: #0c0e0f !important;
+  --button-filled-brand-text-hover: #0c0e0f !important;
+  --control-primary-background-default: #6791c9 !important;
+  --control-primary-background-hover: #709ad2 !important;
+  --control-primary-background-active: #709ad2 !important;
+  --control-primary-text-default: #0c0e0f !important;
+  --focus-primary: #6791c9 !important;
+  --mention-foreground: #709ad2 !important;
+  --mention-background: rgba(103,145,201, 0.18) !important;
+  --info-help-foreground: #6791c9 !important;
+  --background-mentioned: rgba(103,145,201, 0.08) !important;
+  --background-mentioned-hover: rgba(103,145,201, 0.12) !important;
+  --background-message-highlight: rgba(103,145,201, 0.08) !important;
+
+  --status-danger: #df5b61 !important;
+  --status-positive: #78b892 !important;
+  --status-warning: #de8f78 !important;
+  --text-danger: #df5b61 !important;
+  --text-positive: #78b892 !important;
+  --text-warning: #de8f78 !important;
+  --green-360: #78b892 !important;
+  --red-400: #df5b61 !important;
+  --yellow-300: #de8f78 !important;
+  --button-danger-background: #df5b61 !important;
+  --button-positive-background: #78b892 !important;
+
+  --scrollbar-thin-thumb: #27292a !important;
+  --scrollbar-auto-thumb: #27292a !important;
+  --scrollbar-auto-track: transparent !important;
+}

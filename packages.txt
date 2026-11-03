@@ -1,0 +1,21 @@
+# Arch packages installed by install.sh. Lines starting with "aur:" come from the AUR.
+
+# compositor and session
+hyprland hypridle uwsm xdg-desktop-portal-hyprland xdg-desktop-portal-gtk xorg-xwayland xorg-xrandr polkit
+
+# shell
+quickshell qt6-wayland qt5-wayland qt6-imageformats python jq
+
+# shell features
+awww cliphist wl-clipboard grim slurp satty wf-recorder imagemagick ffmpeg
+playerctl brightnessctl ddcutil cava lm_sensors upower power-profiles-daemon
+networkmanager network-manager-applet bluez bluez-utils wireguard-tools nftables
+pipewire pipewire-pulse pipewire-alsa wireplumber libpulse noise-suppression-for-voice mpv
+libnotify xdg-utils xdg-user-dirs zenity
+
+# look
+adw-gtk-theme papirus-icon-theme qt6ct ttf-roboto ttf-jetbrains-mono-nerd ttf-iosevkaterm-nerd noto-fonts-emoji
+aur:bibata-cursor-theme-bin
+
+# terminal and apps used by the keybindings
+zsh git kitty vim dolphin firefox
